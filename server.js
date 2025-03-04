@@ -46,6 +46,12 @@ app.post("/new-user", async (request, response) => {
     };
     logger.info(`New user created: ${JSON.stringify(newUser)}`);
     response.send(JSON.stringify(result)).end();
+
+    // добавляем оповещение всех о новом участнике чата
+    [...wsServer.clients]
+      .filter((o) => o.readyState === WebSocket.OPEN)
+      .forEach((o) => o.send(JSON.stringify(userState)));
+    logger.info("Updated user list sent to all clients");
   } else {
     const result = {
       status: "error",
